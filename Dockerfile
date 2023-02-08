@@ -8,9 +8,8 @@ COPY package*.json ./
 COPY tsconfig.json ./
 COPY src ./src
 
-RUN npm install
-RUN npm run build
-RUN npm prune --production
+RUN yarn install
+RUN yarn build
 
 FROM alpine:3.14
 
