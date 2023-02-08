@@ -8,6 +8,11 @@ export const env = envsafe({
   BACKUP_DATABASE_URL: str({
     desc: 'The connection string of the database to backup.'
   }),
+  BACKUP_DIR: str({
+    desc: 'The directory to store the backup in.',
+    default: '/tmp',
+    allowEmpty: true
+  }),
   BACKUP_CRON_SCHEDULE: str({
     desc: 'The cron schedule to run the backup on.',
     default: '0 5 * * *',

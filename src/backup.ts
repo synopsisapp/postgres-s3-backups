@@ -36,7 +36,7 @@ const dumpToFile = async (path: string) => {
 
   await new Promise((resolve, reject) => {
     exec(
-      `pg_dump ${env.BACKUP_DATABASE_URL} -F t | gzip > ${path}`,
+      `mkdir -p backups/${env.BACKUP_DIR} && pg_dump -d ${env.BACKUP_DATABASE_URL} --clean -x -Ft > ${path}`,
       (error, stdout, stderr) => {
         if (error) {
           reject({ error: JSON.stringify(error), stderr });
@@ -66,11 +66,14 @@ export const backup = async () => {
   console.log("Initiating DB backup...")
 
   let date = new Date().toISOString()
+  const backupDir = env.BACKUP_DIR || '/tmp'
   const timestamp = date.replace(/[:.]+/g, '-')
   const filename = `backup-${timestamp}.tar.gz`
-  const filepath = `/tmp/${filename}`
+  const filepath = `backu/${backupDir}/${filename}`
 
+  console.log('dumping to file')
   await dumpToFile(filepath)
+  console.log('uploading to s3')
   await uploadToS3({name: filename, path: filepath})
   await deleteFile(filepath)
 
