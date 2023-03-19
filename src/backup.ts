@@ -68,7 +68,7 @@ export const backup = async () => {
   const backupDir = env.BACKUP_DIR || '/tmp'
   const timestamp = date.replace(/[:.]+/g, '-')
   const filename = `backup-${timestamp}.tar.gz`
-  const filepath = `backup/${backupDir}/${filename}`
+  const filepath = `backups/${backupDir}/${filename}`
 
   console.log('dumping to file')
   await dumpToFile(filepath)
