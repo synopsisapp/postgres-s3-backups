@@ -33,10 +33,9 @@ const uploadToS3 = async ({ name, path }: {name: string, path: string}) => {
 
 const dumpToFile = async (path: string) => {
   console.log("Dumping DB to file...");
-
   await new Promise((resolve, reject) => {
     exec(
-      `mkdir -p backups/${env.BACKUP_DIR} && pg_dump -d ${env.BACKUP_DATABASE_URL} --clean -x -Ft > ${path}`,
+      `mkdir -p backups/${env.BACKUP_DIR} && pg_dump -d ${env.BACKUP_DATABASE_URL} -x -Fc > ${path}`,
       (error, stdout, stderr) => {
         if (error) {
           reject({ error: JSON.stringify(error), stderr });
