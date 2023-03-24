@@ -20,8 +20,9 @@ const runBackup = async () => {
   }
 }
 
-runBackup();
-// start cron
-job.start();
+// runBackup();
+// // start cron
+// job.start();
 
+console.log('gtxm')
 console.log("Backup cron scheduled...")

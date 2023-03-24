@@ -35,6 +35,7 @@ const dumpToFile = async (path: string) => {
   console.log("Dumping DB to file...");
   await new Promise((resolve, reject) => {
     exec(
+      // await $`pg_dump -d ${dbUrl} -x -Fc > ${dir}/${now}_${flavor}_backup.sql`
       `mkdir -p backups/${env.BACKUP_DIR} && pg_dump -d ${env.BACKUP_DATABASE_URL} -x -Fc > ${path}`,
       (error, stdout, stderr) => {
         if (error) {
@@ -62,19 +63,21 @@ const deleteFile = async (path: string) => {
 }
 
 export const backup = async () => {
+  console.log('here')
   console.log("Initiating DB backup...")
 
   let date = new Date().toISOString()
   const backupDir = env.BACKUP_DIR || '/tmp'
   const timestamp = date.replace(/[:.]+/g, '-')
-  const filename = `backup-${timestamp}.tar.gz`
+  const filename = `backup-${timestamp}.sql`
   const filepath = `backups/${backupDir}/${filename}`
 
-  console.log('dumping to file')
-  await dumpToFile(filepath)
-  console.log('uploading to s3')
-  await uploadToS3({name: filename, path: filepath})
-  await deleteFile(filepath)
+  console.log('sdfkajsdflkjsdf')
+  console.log('dumping to file', filepath)
+  // await dumpToFile(filepath)
+  // console.log('uploading to s3')
+  // await uploadToS3({name: filename, path: filepath})
+  // await deleteFile(filepath)
 
   console.log("DB backup complete...")
 }
