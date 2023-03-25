@@ -1,4 +1,4 @@
-import { exec } from "child_process";
+import { exec, execSync } from "child_process";
 import { PutObjectCommand, S3Client, S3ClientConfig } from "@aws-sdk/client-s3";
 import { createReadStream, unlink } from "fs";
 
@@ -33,21 +33,27 @@ const uploadToS3 = async ({ name, path }: {name: string, path: string}) => {
 
 const dumpToFile = async (path: string) => {
   console.log("Dumping DB to file...");
+
+  // Create the backup directory if it doesn't exist
+  execSync(`mkdir -p backups/${env.BACKUP_DIR}`);
+
   await new Promise((resolve, reject) => {
+    // Run pg_dump separately from mkdir
     exec(
-      `mkdir -p backups/${env.BACKUP_DIR} && pg_dump -d ${env.BACKUP_DATABASE_URL} -x -Fc > ${path}`,
+      `pg_dump -d ${env.BACKUP_DATABASE_URL} -x -Fc > ${path}`,
       (error, stdout, stderr) => {
         if (error) {
+          console.log("error", error);
           reject({ error: JSON.stringify(error), stderr });
           return;
         }
 
+        console.log("DB dumped to file...");
         resolve(undefined);
       }
     );
   });
 
-  console.log("DB dumped to file...");
 }
 
 const deleteFile = async (path: string) => {
@@ -67,13 +73,13 @@ export const backup = async () => {
   let date = new Date().toISOString()
   const backupDir = env.BACKUP_DIR || '/tmp'
   const timestamp = date.replace(/[:.]+/g, '-')
-  const filename = `backup-${timestamp}.tar.gz`
+  const filename = `backup-${timestamp}.sql`
   const filepath = `backups/${backupDir}/${filename}`
 
-  console.log('dumping to file')
+  console.log('dumping to file', filepath)
   await dumpToFile(filepath)
   console.log('uploading to s3')
-  await uploadToS3({name: filename, path: filepath})
+  await uploadToS3({name: filepath, path: filepath})
   await deleteFile(filepath)
 
   console.log("DB backup complete...")
