@@ -40,7 +40,7 @@ const dumpToFile = async (path: string) => {
   await new Promise((resolve, reject) => {
     // Run pg_dump separately from mkdir
     exec(
-      `pg_dump -d ${env.BACKUP_DATABASE_URL} -x -Fc > ${path}`,
+      `pg_dump -d ${env.BACKUP_DATABASE_URL} --schema=public -x -O -F p > ${path}`,
       (error, stdout, stderr) => {
         if (error) {
           console.log("error", error);
